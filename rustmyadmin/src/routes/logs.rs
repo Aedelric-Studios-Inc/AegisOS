@@ -1,0 +1,1 @@
+//! Logs route scaffold.

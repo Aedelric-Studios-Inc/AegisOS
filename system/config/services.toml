@@ -1,0 +1,6 @@
+# Canonical runtime config scaffold copied from image/rootfs/etc/services.toml
+
+[[service]]
+name = "firewall"
+bin = "/sbin/aegis-firewall"
+restart = "always"

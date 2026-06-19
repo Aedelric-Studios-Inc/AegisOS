@@ -1,0 +1,1 @@
+/* Compatibility placeholder for thread lifecycle support. */

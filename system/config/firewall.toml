@@ -1,0 +1,6 @@
+# Canonical runtime config scaffold copied from image/rootfs/etc/firewall.toml
+
+[[rule]]
+direction = "inbound"
+action = "drop"
+comment = "Default deny all inbound"

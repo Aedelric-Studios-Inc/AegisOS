@@ -11,6 +11,7 @@ pub struct AppState {
     services: Vec<ServiceStatus>,
     devices: Vec<DeviceRecord>,
     events: Vec<SecurityEvent>,
+    admin_databases: Vec<AdminDatabase>,
     overview: Overview,
 }
 
@@ -103,6 +104,33 @@ pub struct SecurityEvent {
     pub message: String,
 }
 
+pub struct AdminDatabase {
+    pub slug: &'static str,
+    pub name: &'static str,
+    pub engine: &'static str,
+    pub access: &'static str,
+    pub summary: String,
+    pub tables: Vec<AdminTable>,
+}
+
+pub struct AdminTable {
+    pub slug: &'static str,
+    pub name: &'static str,
+    pub engine: &'static str,
+    pub rows: usize,
+    pub note: String,
+    pub recommended_query: &'static str,
+    pub columns: Vec<AdminColumn>,
+    pub sample_rows: Vec<Vec<String>>,
+}
+
+pub struct AdminColumn {
+    pub name: &'static str,
+    pub data_type: &'static str,
+    pub nullable: bool,
+    pub key: &'static str,
+}
+
 pub struct Overview {
     pub total_devices: usize,
     pub blocked_devices: usize,
@@ -118,6 +146,7 @@ impl AppState {
         let devices = build_devices();
         let services = build_services(&devices);
         let events = build_events(&devices, &services);
+        let admin_databases = build_admin_databases(&devices, &services, &events);
         let overview = build_overview(&devices, &services);
 
         Self {
@@ -126,6 +155,7 @@ impl AppState {
             services,
             devices,
             events,
+            admin_databases,
             overview,
         }
     }
@@ -144,6 +174,24 @@ impl AppState {
 
     pub fn events(&self) -> &[SecurityEvent] {
         &self.events
+    }
+
+    pub fn admin_databases(&self) -> &[AdminDatabase] {
+        &self.admin_databases
+    }
+
+    pub fn find_admin_database(&self, slug: &str) -> Option<&AdminDatabase> {
+        self.admin_databases.iter().find(|database| database.slug == slug)
+    }
+
+    pub fn find_admin_table(
+        &self,
+        database_slug: &str,
+        table_slug: &str,
+    ) -> Option<(&AdminDatabase, &AdminTable)> {
+        let database = self.find_admin_database(database_slug)?;
+        let table = database.tables.iter().find(|table| table.slug == table_slug)?;
+        Some((database, table))
     }
 
     pub fn status_json(&self) -> String {
@@ -210,6 +258,90 @@ impl AppState {
             .join(",");
 
         format!("{{\"devices\":[{}]}}", devices)
+    }
+
+    pub fn rustmyadmin_catalog_json(&self) -> String {
+        let databases = self
+            .admin_databases
+            .iter()
+            .map(|database| {
+                let tables = database
+                    .tables
+                    .iter()
+                    .map(|table| {
+                        format!(
+                            "{{\"slug\":\"{}\",\"name\":\"{}\",\"engine\":\"{}\",\"rows\":{},\"columns\":{}}}",
+                            json_escape(table.slug),
+                            json_escape(table.name),
+                            json_escape(table.engine),
+                            table.rows,
+                            table.columns.len()
+                        )
+                    })
+                    .collect::<Vec<_>>()
+                    .join(",");
+
+                format!(
+                    "{{\"slug\":\"{}\",\"name\":\"{}\",\"engine\":\"{}\",\"access\":\"{}\",\"summary\":\"{}\",\"tables\":[{}]}}",
+                    json_escape(database.slug),
+                    json_escape(database.name),
+                    json_escape(database.engine),
+                    json_escape(database.access),
+                    json_escape(&database.summary),
+                    tables
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+
+        format!(
+            "{{\"readonly\":true,\"databases\":[{}],\"hostname\":\"{}\"}}",
+            databases,
+            json_escape(self.hostname)
+        )
+    }
+
+    pub fn rustmyadmin_table_json(&self, database_slug: &str, table_slug: &str) -> Option<String> {
+        let (database, table) = self.find_admin_table(database_slug, table_slug)?;
+        let columns = table
+            .columns
+            .iter()
+            .map(|column| {
+                format!(
+                    "{{\"name\":\"{}\",\"type\":\"{}\",\"nullable\":{},\"key\":\"{}\"}}",
+                    json_escape(column.name),
+                    json_escape(column.data_type),
+                    column.nullable,
+                    json_escape(column.key)
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        let sample_rows = table
+            .sample_rows
+            .iter()
+            .map(|row| {
+                let values = row
+                    .iter()
+                    .map(|value| format!("\"{}\"", json_escape(value)))
+                    .collect::<Vec<_>>()
+                    .join(",");
+                format!("[{}]", values)
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+
+        Some(format!(
+            "{{\"database\":\"{}\",\"table\":\"{}\",\"engine\":\"{}\",\"rows\":{},\"note\":\"{}\",\"recommended_query\":\"{}\",\"columns\":[{}],\"sample_rows\":[{}]}}",
+            json_escape(database.name),
+            json_escape(table.name),
+            json_escape(table.engine),
+            table.rows,
+            json_escape(&table.note),
+            json_escape(table.recommended_query),
+            columns,
+            sample_rows
+        ))
     }
 }
 
@@ -477,6 +609,262 @@ fn build_events(devices: &[DeviceRecord], services: &[ServiceStatus]) -> Vec<Sec
     ]
 }
 
+fn build_admin_databases(
+    devices: &[DeviceRecord],
+    services: &[ServiceStatus],
+    events: &[SecurityEvent],
+) -> Vec<AdminDatabase> {
+    vec![
+        AdminDatabase {
+            slug: "control-plane",
+            name: "control_plane",
+            engine: "AegisOS/heap",
+            access: "owner-readonly",
+            summary: "Dashboard inventory adapted into a RustMyAdmin-style schema browser."
+                .to_owned(),
+            tables: vec![
+                AdminTable {
+                    slug: "devices",
+                    name: "devices",
+                    engine: "virtual",
+                    rows: devices.len(),
+                    note: "Observed clients with policy decisions, roles, and exposed ports."
+                        .to_owned(),
+                    recommended_query:
+                        "SELECT hostname, ip, risk FROM devices ORDER BY hostname LIMIT 25;",
+                    columns: vec![
+                        AdminColumn {
+                            name: "hostname",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "PRI",
+                        },
+                        AdminColumn {
+                            name: "ip",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "UNI",
+                        },
+                        AdminColumn {
+                            name: "mac",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "",
+                        },
+                        AdminColumn {
+                            name: "risk",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "MUL",
+                        },
+                        AdminColumn {
+                            name: "roles",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "",
+                        },
+                        AdminColumn {
+                            name: "enforcement",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "",
+                        },
+                    ],
+                    sample_rows: devices
+                        .iter()
+                        .take(4)
+                        .map(|device| {
+                            vec![
+                                device.hostname.to_owned(),
+                                device.ip.to_owned(),
+                                device.mac.to_owned(),
+                                device.risk.label().to_owned(),
+                                device.roles.join(", "),
+                                device.enforcement.clone(),
+                            ]
+                        })
+                        .collect(),
+                },
+                AdminTable {
+                    slug: "services",
+                    name: "services",
+                    engine: "virtual",
+                    rows: services.len(),
+                    note: "Service health scores and exposure summaries for protected workloads."
+                        .to_owned(),
+                    recommended_query:
+                        "SELECT name, category, health_score FROM services ORDER BY health_score DESC;",
+                    columns: vec![
+                        AdminColumn {
+                            name: "name",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "PRI",
+                        },
+                        AdminColumn {
+                            name: "category",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "",
+                        },
+                        AdminColumn {
+                            name: "endpoint",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "",
+                        },
+                        AdminColumn {
+                            name: "status",
+                            data_type: "TEXT",
+                            nullable: false,
+                            key: "",
+                        },
+                        AdminColumn {
+                            name: "health_score",
+                            data_type: "INTEGER",
+                            nullable: false,
+                            key: "MUL",
+                        },
+                    ],
+                    sample_rows: services
+                        .iter()
+                        .take(4)
+                        .map(|service| {
+                            vec![
+                                service.name.to_owned(),
+                                service.category.to_owned(),
+                                service.endpoint.to_owned(),
+                                service.status.to_owned(),
+                                service.health_score.to_string(),
+                            ]
+                        })
+                        .collect(),
+                },
+            ],
+        },
+        AdminDatabase {
+            slug: "security",
+            name: "security",
+            engine: "AegisOS/audit",
+            access: "owner-readonly",
+            summary: "Audit-oriented tables that mirror the event log and quarantine decisions."
+                .to_owned(),
+            tables: vec![AdminTable {
+                slug: "events",
+                name: "events",
+                engine: "append-only",
+                rows: events.len(),
+                note: "Recent policy actions and operator-facing telemetry.".to_owned(),
+                recommended_query:
+                    "SELECT timestamp, severity, message FROM events ORDER BY timestamp DESC LIMIT 20;",
+                columns: vec![
+                    AdminColumn {
+                        name: "timestamp",
+                        data_type: "TEXT",
+                        nullable: false,
+                        key: "PRI",
+                    },
+                    AdminColumn {
+                        name: "severity",
+                        data_type: "TEXT",
+                        nullable: false,
+                        key: "MUL",
+                    },
+                    AdminColumn {
+                        name: "message",
+                        data_type: "TEXT",
+                        nullable: false,
+                        key: "",
+                    },
+                ],
+                sample_rows: events
+                    .iter()
+                    .take(4)
+                    .map(|event| {
+                        vec![
+                            event.timestamp.to_owned(),
+                            event.severity.label().to_owned(),
+                            event.message.clone(),
+                        ]
+                    })
+                    .collect(),
+            }],
+        },
+        AdminDatabase {
+            slug: "content",
+            name: "content",
+            engine: "AegisOS/dashboard",
+            access: "owner-readonly",
+            summary: "Content-facing metadata that lets operators inspect the dashboard posture."
+                .to_owned(),
+            tables: vec![AdminTable {
+                slug: "overview",
+                name: "overview",
+                engine: "materialized",
+                rows: 1,
+                note: "Single-row posture summary suitable for health panels or exports."
+                    .to_owned(),
+                recommended_query:
+                    "SELECT total_devices, blocked_devices, monitored_devices, online_services FROM overview;",
+                columns: vec![
+                    AdminColumn {
+                        name: "total_devices",
+                        data_type: "INTEGER",
+                        nullable: false,
+                        key: "",
+                    },
+                    AdminColumn {
+                        name: "blocked_devices",
+                        data_type: "INTEGER",
+                        nullable: false,
+                        key: "",
+                    },
+                    AdminColumn {
+                        name: "monitored_devices",
+                        data_type: "INTEGER",
+                        nullable: false,
+                        key: "",
+                    },
+                    AdminColumn {
+                        name: "online_services",
+                        data_type: "INTEGER",
+                        nullable: false,
+                        key: "",
+                    },
+                    AdminColumn {
+                        name: "summary",
+                        data_type: "TEXT",
+                        nullable: false,
+                        key: "",
+                    },
+                ],
+                sample_rows: vec![vec![
+                    devices.len().to_string(),
+                    devices
+                        .iter()
+                        .filter(|device| matches!(device.risk, RiskLevel::Blocked))
+                        .count()
+                        .to_string(),
+                    devices
+                        .iter()
+                        .filter(|device| matches!(device.risk, RiskLevel::Monitor))
+                        .count()
+                        .to_string(),
+                    services
+                        .iter()
+                        .filter(|service| service.health_score >= 60)
+                        .count()
+                        .to_string(),
+                    format!(
+                        "{} databases mirrored into a RustMyAdmin-style inspector.",
+                        3
+                    ),
+                ]],
+            }],
+        },
+    ]
+}
+
 fn build_overview(devices: &[DeviceRecord], services: &[ServiceStatus]) -> Overview {
     let blocked = devices
         .iter()
@@ -589,5 +977,24 @@ mod tests {
         assert!(json.contains("\"status\":\"ok\""));
         assert!(json.contains("\"services\""));
         assert!(json.contains("\"hostname\":\"aegisbox\""));
+    }
+
+    #[test]
+    fn builds_rustmyadmin_catalog() {
+        let state = AppState::new();
+        let json = state.rustmyadmin_catalog_json();
+        assert!(state.find_admin_database("control-plane").is_some());
+        assert!(json.contains("\"readonly\":true"));
+        assert!(json.contains("\"control-plane\""));
+    }
+
+    #[test]
+    fn emits_table_json_for_rustmyadmin_views() {
+        let state = AppState::new();
+        let json = state
+            .rustmyadmin_table_json("security", "events")
+            .expect("security/events table should exist");
+        assert!(json.contains("\"table\":\"events\""));
+        assert!(json.contains("\"sample_rows\""));
     }
 }

@@ -9,7 +9,7 @@ mod state;
 use std::io::{Read, Write};
 use std::net::{IpAddr, TcpListener, TcpStream};
 
-use routes::{dashboard, devices, firewall, logs, updates, vpn};
+use routes::{dashboard, devices, firewall, logs, rustmyadmin, updates, vpn};
 use state::AppState;
 
 fn main() -> std::io::Result<()> {
@@ -70,17 +70,48 @@ fn handle_connection(stream: &mut TcpStream, state: &AppState) -> std::io::Resul
 }
 
 fn route_request(path: &str, state: &AppState) -> Response {
+    let path = path.split('?').next().unwrap_or(path);
+
     match path {
         "/" | "/dashboard" => Response::html(200, "OK", dashboard::index(state)),
         "/devices" => Response::html(200, "OK", devices::index(state)),
         "/firewall" => Response::html(200, "OK", firewall::index(state)),
         "/vpn" => Response::html(200, "OK", vpn::index(state)),
         "/logs" => Response::html(200, "OK", logs::index(state)),
+        "/rustmyadmin" => Response::html(200, "OK", rustmyadmin::index(state)),
         "/updates" => Response::html(200, "OK", updates::index(state)),
         "/api/status" => Response::json(200, "OK", api::get_status(state)),
         "/api/devices" => Response::json(200, "OK", api::get_devices(state)),
+        "/api/rustmyadmin" => Response::json(200, "OK", api::get_rustmyadmin_catalog(state)),
+        _ if path.starts_with("/rustmyadmin/") => match parse_admin_table_path(path) {
+            Some((database_slug, table_slug)) => rustmyadmin::table_detail(state, database_slug, table_slug)
+                .map(|body| Response::html(200, "OK", body))
+                .unwrap_or_else(|| {
+                    Response::text(404, "Not Found", "Requested RustMyAdmin table was not found.")
+                }),
+            None => Response::text(404, "Not Found", "Requested RustMyAdmin route was not found."),
+        },
+        _ if path.starts_with("/api/rustmyadmin/") => match parse_admin_table_path(
+            path.trim_start_matches("/api"),
+        ) {
+            Some((database_slug, table_slug)) => api::get_rustmyadmin_table(state, database_slug, table_slug)
+                .map(|body| Response::json(200, "OK", body))
+                .unwrap_or_else(|| {
+                    Response::text(404, "Not Found", "Requested RustMyAdmin table was not found.")
+                }),
+            None => Response::text(404, "Not Found", "Requested RustMyAdmin API route was not found."),
+        },
         _ => Response::text(404, "Not Found", "AegisOS dashboard route not found."),
     }
+}
+
+fn parse_admin_table_path(path: &str) -> Option<(&str, &str)> {
+    let path = path.strip_prefix("/rustmyadmin/")?;
+    let (database_slug, table_slug) = path.split_once("/table/")?;
+    if database_slug.is_empty() || table_slug.is_empty() {
+        return None;
+    }
+    Some((database_slug, table_slug))
 }
 
 struct Response {
