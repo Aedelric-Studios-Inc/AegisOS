@@ -1,5 +1,19 @@
 //! Security audit logging.
 
+/// Read the ARM generic timer counter (CNTPCT_EL0).
+#[inline]
+fn read_cntpct() -> u64 {
+    #[cfg(target_arch = "aarch64")]
+    {
+        let val: u64;
+        // SAFETY: CNTPCT_EL0 is always readable from EL1/EL0 on AArch64.
+        unsafe { core::arch::asm!("mrs {}, cntpct_el0", out(reg) val, options(nomem, nostack)); }
+        val
+    }
+    #[cfg(not(target_arch = "aarch64"))]
+    { 0 }
+}
+
 /// Categories of auditable events.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy)]
@@ -34,7 +48,7 @@ pub fn audit_log(event: AuditEvent, tid: u32, detail: u64) {
     // SAFETY: single-core kernel, no concurrent access during early boot
     unsafe {
         AUDIT_BUF[AUDIT_HEAD % AUDIT_BUF_SIZE] = Some(AuditEntry {
-            timestamp_ticks: 0, // TODO: read ARM generic timer
+            timestamp_ticks: read_cntpct(),
             event,
             tid,
             detail,

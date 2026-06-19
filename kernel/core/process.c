@@ -189,6 +189,19 @@ int process_grant_cap(u32 pid, cap_token_t cap) {
     return AEGIS_OK;
 }
 
+int process_revoke_cap(u32 pid, cap_token_t cap) {
+    process_t *p = process_get(pid);
+    if (!p) return AEGIS_ENOENT;
+    for (u32 i = 0; i < p->cap_count; i++) {
+        if (p->cap_set[i] == cap) {
+            /* Compact the array */
+            p->cap_set[i] = p->cap_set[--p->cap_count];
+            return AEGIS_OK;
+        }
+    }
+    return AEGIS_ENOENT;
+}
+
 bool process_has_cap(u32 pid, cap_token_t cap) {
     process_t *p = process_get(pid);
     if (!p) return false;
