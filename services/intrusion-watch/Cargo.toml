@@ -1,0 +1,6 @@
+[package]
+name        = "aegis-intrusion-watch"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "Intrusion detection service"

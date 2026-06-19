@@ -1,0 +1,27 @@
+# Partition layout for AegisOS image
+
+[[partition]]
+label      = "boot"
+type       = "fat32"
+size_mb    = 256
+mountpoint = "/boot"
+
+[[partition]]
+label      = "rootfs-a"
+type       = "ext4"
+size_mb    = 2048
+mountpoint = "/"
+
+[[partition]]
+label      = "rootfs-b"
+type       = "ext4"
+size_mb    = 2048
+mountpoint = "/"
+comment    = "Inactive A/B slot for OTA updates"
+
+[[partition]]
+label      = "data"
+type       = "ext4"
+size_mb    = 0
+comment    = "Fills remaining space"
+mountpoint = "/var/aegis"

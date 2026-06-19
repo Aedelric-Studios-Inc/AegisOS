@@ -1,0 +1,18 @@
+# Default firewall rules
+
+[[rule]]
+direction = "inbound"
+action    = "drop"
+comment   = "Default deny all inbound"
+
+[[rule]]
+direction = "inbound"
+action    = "accept"
+dst_port  = 8080
+protocol  = "tcp"
+comment   = "Allow dashboard"
+
+[[rule]]
+direction = "outbound"
+action    = "accept"
+comment   = "Allow all outbound"

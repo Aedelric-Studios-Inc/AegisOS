@@ -1,0 +1,6 @@
+[package]
+name        = "aegis-container-runner"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "Lightweight container runtime"

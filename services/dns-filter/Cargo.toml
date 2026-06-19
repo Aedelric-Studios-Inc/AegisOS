@@ -1,0 +1,6 @@
+[package]
+name        = "aegis-dns-filter"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "DNS filtering and ad-blocking service"
