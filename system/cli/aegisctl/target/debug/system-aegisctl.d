@@ -1,0 +1,1 @@
+/home/runner/work/AegisOS/AegisOS/system/cli/aegisctl/target/debug/system-aegisctl: /home/runner/work/AegisOS/AegisOS/system/cli/aegisctl/src/commands.rs /home/runner/work/AegisOS/AegisOS/system/cli/aegisctl/src/firewall.rs /home/runner/work/AegisOS/AegisOS/system/cli/aegisctl/src/main.rs /home/runner/work/AegisOS/AegisOS/system/cli/aegisctl/src/service.rs

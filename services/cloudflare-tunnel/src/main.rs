@@ -77,10 +77,24 @@ fn run_tunnel(stream: &mut TcpStream, token: &str) -> Result<(), String> {
 
     // Keep-alive loop: forward bytes between tunnel and local services.
     let mut buf = [0u8; 4096];
+    let mut total_bytes: u64 = 0;
     loop {
         match stream.read(&mut buf) {
             Ok(0) => return Err("server closed connection".to_owned()),
-            Ok(_n) => { /* proxy data to local service — stubbed */ }
+            Ok(n) => {
+                total_bytes += n as u64;
+                // TODO: parse Cloudflare Tunnel protocol frames and forward to
+                // the appropriate local service.  The full protocol uses QUIC
+                // or HTTP/2 multiplexing over TLS; a complete implementation
+                // requires those transport libraries.  For now we drain the
+                // socket so the connection stays alive and log traffic volume.
+                if total_bytes % (64 * 1024) < n as u64 {
+                    eprintln!(
+                        "[cloudflare-tunnel] proxied {} KB (full protocol not yet implemented)",
+                        total_bytes / 1024
+                    );
+                }
+            }
             Err(e) => return Err(e.to_string()),
         }
     }

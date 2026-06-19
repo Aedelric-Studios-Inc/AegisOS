@@ -26,7 +26,13 @@ fn main() {
     };
     sock.set_read_timeout(Some(Duration::from_secs(5))).ok();
 
-    let upstream = UdpSocket::bind("0.0.0.0:0").expect("upstream socket");
+    let upstream = match UdpSocket::bind("0.0.0.0:0") {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("[dns-filter] failed to create upstream socket: {}", e);
+            loop { std::thread::sleep(Duration::from_secs(60)); }
+        }
+    };
     upstream.set_read_timeout(Some(Duration::from_secs(2))).ok();
 
     let mut buf = [0u8; 512];

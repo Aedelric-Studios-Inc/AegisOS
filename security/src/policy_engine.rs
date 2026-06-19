@@ -58,7 +58,7 @@ impl PolicyEngine {
         Ok(())
     }
 
-    /// Evaluate a request. Returns `Allow` if no matching rule is found (default allow).
+    /// Evaluate a request. Returns `Deny` if no matching rule is found (default deny).
     pub fn evaluate(
         &self,
         tid: u32,
@@ -78,6 +78,8 @@ impl PolicyEngine {
                 }
             }
         }
-        PolicyDecision::Allow
+        // Default-deny: no matching rule means the action is not explicitly permitted.
+        audit_log(AuditEvent::PolicyDenied, tid, 0);
+        PolicyDecision::Deny
     }
 }

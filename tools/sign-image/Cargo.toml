@@ -3,3 +3,6 @@ name    = "aegis-sign-image"
 version = "0.1.0"
 edition = "2021"
 license = "Proprietary"
+
+[dependencies]
+ed25519-dalek = { version = "2.1.1", features = ["pkcs8", "pem"] }

@@ -54,11 +54,13 @@ fn handle_connection(stream: &mut TcpStream, state: &AppState) -> std::io::Resul
 
     let response = if method != "GET" {
         Response::text(405, "Method Not Allowed", "Only GET is supported.")
-    } else if path.starts_with("/api/") && !auth::authorize_api_request(authorization, peer_ip) {
+    } else if !auth::authorize_api_request(authorization, peer_ip) {
+        // All routes (HTML and API) require authentication when a token is configured.
+        // Loopback requests are exempt so that local tooling still works without a token.
         Response::text(
             401,
             "Unauthorized",
-            "Set AEGIS_DASHBOARD_TOKEN and send it as an Authorization header for API access.",
+            "Set AEGIS_DASHBOARD_TOKEN and send it as an Authorization: ****** header.",
         )
     } else {
         route_request(path, state)
