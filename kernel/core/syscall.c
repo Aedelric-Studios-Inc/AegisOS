@@ -136,9 +136,14 @@ s64 sys_cap_grant(u64 target_pid, u64 cap_token, u64 a2, u64 a3, u64 a4, u64 a5)
 
 s64 sys_cap_revoke(u64 target_pid, u64 cap_token, u64 a2, u64 a3, u64 a4, u64 a5) {
     (void)a2; (void)a3; (void)a4; (void)a5;
-    (void)target_pid; (void)cap_token;
-    /* TODO: implement capability revocation */
-    return AEGIS_OK;
+    if (cap_token == 0) return AEGIS_EINVAL;
+    /* Remove the capability from the target process's cap set */
+    extern int process_revoke_cap(u32 pid, cap_token_t cap);
+    int ret = process_revoke_cap((u32)target_pid, (cap_token_t)cap_token);
+    if (ret != AEGIS_OK) return ret;
+    /* Invalidate the capability in the global capability table */
+    extern s64 cap_revoke(cap_token_t tok);
+    return cap_revoke((cap_token_t)cap_token);
 }
 
 s64 sys_yield(u64 a0, u64 a1, u64 a2, u64 a3, u64 a4, u64 a5) {
