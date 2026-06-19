@@ -4,8 +4,16 @@
  */
 
 #include "aegis_kernel.h"
+#include "hal.h"
+
+extern int  board_init(void);
+extern void gic_init(void);
 
 void kernel_main(void) {
+    if (hal_init() != 0) PANIC("hal_init() failed");
+    if (board_init() != 0) PANIC("board_init() failed");
+    gic_init();
+
     /* Initialize physical memory allocator */
     phys_mem_init(0x40000000UL, 0x40000000UL);  /* 1 GB starting at 0x40000000 */
 

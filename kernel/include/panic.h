@@ -10,3 +10,4 @@ __attribute__((noreturn))
 void kernel_panic(const char *msg, const char *file, int line);
 
 void panic_dump_regs(void);
+void printk(const char *fmt, ...);
