@@ -2,6 +2,7 @@ pub mod dashboard;
 pub mod devices;
 pub mod firewall;
 pub mod logs;
+pub mod rustmyadmin;
 pub mod updates;
 pub mod vpn;
 
@@ -12,6 +13,7 @@ pub(crate) fn render_page(title: &str, active: &str, body: String) -> String {
         ("/firewall", "Filtering"),
         ("/vpn", "VPN"),
         ("/logs", "Logs"),
+        ("/rustmyadmin", "RustMyAdmin"),
         ("/updates", "Platform"),
     ]
     .into_iter()
@@ -138,6 +140,41 @@ pub(crate) fn render_page(title: &str, active: &str, body: String) -> String {
       grid-template-columns: 1.2fr 0.8fr;
       gap: 18px;
       margin-top: 18px;
+    }}
+    .panel-heading {{
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }}
+    .chip-row {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }}
+    .chip {{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(31, 53, 87, 0.8);
+      background: rgba(8, 17, 31, 0.65);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }}
+    code, pre {{
+      font-family: "SFMono-Regular", ui-monospace, monospace;
+    }}
+    pre {{
+      margin: 16px 0 0;
+      padding: 14px;
+      border: 1px solid rgba(31, 53, 87, 0.8);
+      border-radius: 14px;
+      background: rgba(8, 17, 31, 0.75);
+      overflow-x: auto;
+      white-space: pre-wrap;
     }}
     @media (max-width: 900px) {{
       header, main {{ padding-left: 18px; padding-right: 18px; }}
