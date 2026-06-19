@@ -1,0 +1,1 @@
+//! Application scaffold for RustMyAdmin.

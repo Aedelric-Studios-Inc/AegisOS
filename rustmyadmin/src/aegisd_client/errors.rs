@@ -1,0 +1,1 @@
+//! aegisd error scaffold.

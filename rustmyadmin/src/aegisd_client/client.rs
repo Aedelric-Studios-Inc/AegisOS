@@ -1,0 +1,1 @@
+//! aegisd client implementation scaffold.

@@ -1,0 +1,9 @@
+[package]
+name = "rustmyadmin"
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+
+[[bin]]
+name = "rustmyadmin"
+path = "src/main.rs"

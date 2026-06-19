@@ -1,0 +1,6 @@
+# Canonical runtime config scaffold copied from image/rootfs/etc/network.toml
+
+[[interface]]
+name = "eth0"
+dhcp = true
+metric = 100
