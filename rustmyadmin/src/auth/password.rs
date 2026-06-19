@@ -36,13 +36,21 @@ fn ct_eq(a: &[u8], b: &[u8]) -> bool {
 }
 
 fn generate_salt() -> [u8; SALT_LEN] {
-    let t = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos() as u64;
+    use std::io::Read;
     let mut s = [0u8; SALT_LEN];
-    for (i, b) in s.iter_mut().enumerate() {
-        *b = ((t >> (i % 8)) ^ (i as u64 * 0x9e37)) as u8;
+    if let Ok(mut f) = std::fs::File::open("/dev/urandom") {
+        let _ = f.read_exact(&mut s);
+    } else {
+        // Fallback: mix thread id + timestamp (non-production path; urandom should always be present).
+        let t = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos() as u64;
+        let tid = std::thread::current().id();
+        let mix = t ^ format!("{:?}", tid).len() as u64;
+        for (i, b) in s.iter_mut().enumerate() {
+            *b = (mix.wrapping_shr(i as u32 * 7) ^ (i as u64).wrapping_mul(97)) as u8;
+        }
     }
     s
 }
