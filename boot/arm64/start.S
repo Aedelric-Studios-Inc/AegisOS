@@ -5,6 +5,7 @@
 
 .section ".text.boot", "ax"
 .global _start
+.extern _vectors
 
 _start:
     /* Disable interrupts, set EL1 stack */
@@ -23,6 +24,11 @@ _start:
     /* Set up stack */
     adr     x0, _stack_top
     mov     sp, x0
+
+    /* Install exception vector table */
+    adr     x0, _vectors
+    msr     vbar_el1, x0
+    isb
 
     /* Jump to kernel main */
     bl      kernel_main
