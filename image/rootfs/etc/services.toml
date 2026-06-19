@@ -1,0 +1,31 @@
+# Service manifest — read by service-manager
+
+[[service]]
+name    = "firewall"
+bin     = "/sbin/aegis-firewall"
+restart = "always"
+
+[[service]]
+name    = "dns-filter"
+bin     = "/sbin/aegis-dns-filter"
+restart = "always"
+
+[[service]]
+name    = "traffic-monitor"
+bin     = "/sbin/aegis-traffic-monitor"
+restart = "on-failure"
+
+[[service]]
+name    = "intrusion-watch"
+bin     = "/sbin/aegis-intrusion-watch"
+restart = "always"
+
+[[service]]
+name    = "device-discovery"
+bin     = "/sbin/aegis-device-discovery"
+restart = "always"
+
+[[service]]
+name    = "dashboard"
+bin     = "/sbin/aegis-dashboard"
+restart = "always"

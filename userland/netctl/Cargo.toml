@@ -1,0 +1,6 @@
+[package]
+name = "netctl"
+description = "AegisOS network control CLI"
+version.workspace = true
+edition.workspace = true
+license.workspace = true

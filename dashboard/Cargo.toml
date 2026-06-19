@@ -1,0 +1,13 @@
+[package]
+name        = "aegis-dashboard"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "AegisOS web management dashboard"
+
+[[bin]]
+name = "aegis-dashboard"
+path = "src/main.rs"
+
+[dependencies]
+# HTTP server and routing — add concrete deps when toolchain is finalized
