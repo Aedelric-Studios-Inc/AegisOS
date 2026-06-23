@@ -1,0 +1,1 @@
+# RustMyAdmin tests scaffold

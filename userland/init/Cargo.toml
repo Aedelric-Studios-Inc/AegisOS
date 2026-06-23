@@ -1,0 +1,6 @@
+[package]
+name = "aegis-init"
+description = "AegisOS init process"
+version.workspace = true
+edition.workspace = true
+license.workspace = true

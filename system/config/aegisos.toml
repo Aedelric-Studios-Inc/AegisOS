@@ -1,0 +1,15 @@
+# Canonical runtime config scaffold copied from image/rootfs/etc/aegisos.toml
+
+[system]
+hostname = "aegisbox"
+timezone = "UTC"
+log_level = "info"
+
+[network]
+dhcp = true
+interface = "eth0"
+
+[security]
+secure_boot = true
+audit_log = true
+capability_mode = "strict"

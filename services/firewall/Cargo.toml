@@ -1,0 +1,6 @@
+[package]
+name        = "aegis-firewall"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "Stateful packet filtering service"

@@ -1,0 +1,9 @@
+[package]
+name = "aegisd"
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+
+[[bin]]
+name = "aegisd"
+path = "src/main.rs"
