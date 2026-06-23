@@ -1,3 +1,13 @@
+<p align="center">
+  <img src="AegisOS.png" alt="AegisOS Logo" width="420">
+</p>
+
+<h1 align="center">AegisOS</h1>
+
+<p align="center">
+  Developer Beta Security Patch v2.0.55.02
+</p>
+
 # AegisOS v2.0
 
 AegisOS is an ARM64-first operating system and router/security appliance platform for the AegisBox hardware family and the ÆÐELRIC Router line. It is built as a freestanding OS direction, not as a Linux distribution, with a layered architecture built around:
