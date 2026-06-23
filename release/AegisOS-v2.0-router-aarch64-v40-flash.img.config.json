@@ -1,0 +1,69 @@
+{
+  "active_profile": "aegisbox-bastion",
+  "admin": {
+    "console": "serial-qemu",
+    "rustmyadmin_handoff": "planned-v47"
+  },
+  "milestone": "v40-flash-layout-disk-config",
+  "network": {
+    "dhcp": {
+      "enabled": false,
+      "planned_range": "192.168.50.100-192.168.50.240"
+    },
+    "firewall": {
+      "default_policy": "deny-inbound"
+    },
+    "lan": "eth1",
+    "nat": {
+      "enabled": false
+    },
+    "wan": "eth0"
+  },
+  "persistence": {
+    "format": "aegisos-config-json-v1",
+    "partition": "AEGIS_CONFIG",
+    "writable_after_mount": true
+  },
+  "profiles": {
+    "aedelric-router": {
+      "mode": "router",
+      "services": [
+        "aegis-init",
+        "aegisd",
+        "routerd",
+        "dhcpd",
+        "dnsd",
+        "firewalld",
+        "rustmyadmin"
+      ]
+    },
+    "aegisbox-bastion": {
+      "mode": "bastion-hardened",
+      "services": [
+        "aegis-init",
+        "aegisd",
+        "routerd",
+        "rustmyadmin"
+      ]
+    },
+    "aegisbox-lite": {
+      "mode": "lite-security-appliance",
+      "services": [
+        "aegis-init",
+        "aegisd",
+        "firewall-lite"
+      ]
+    },
+    "aegisbox-pro": {
+      "mode": "pro-security-appliance",
+      "services": [
+        "aegis-init",
+        "aegisd",
+        "routerd",
+        "backupd"
+      ]
+    }
+  },
+  "release": "AegisOS-v2.0",
+  "schema": "aegisos-config-v1"
+}

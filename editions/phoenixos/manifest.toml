@@ -1,0 +1,23 @@
+name = "PhoenixOS Preparation Layer"
+base = "AegisOS Core"
+status = "deferred-design-prep"
+planned_window = "after AegisBox prototype hardening"
+
+[inherit_from_aegisos]
+secure_boot = true
+signed_updates = true
+radio_abstraction = true
+network_policy = true
+audit_model = true
+capability_model = true
+payment_integration_contracts = true
+rustmyadmin_device_management = true
+
+[deferred]
+mobile_shell = true
+app_runtime = true
+calls_sms_mms = true
+ims_volte = true
+emergency_calling = true
+camera_media_hal = true
+carrier_certification = true

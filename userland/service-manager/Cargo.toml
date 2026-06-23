@@ -1,0 +1,6 @@
+[package]
+name = "service-manager"
+description = "AegisOS service manager"
+version.workspace = true
+edition.workspace = true
+license.workspace = true

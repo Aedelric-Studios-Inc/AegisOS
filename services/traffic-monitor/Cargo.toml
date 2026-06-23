@@ -1,0 +1,6 @@
+[package]
+name        = "aegis-traffic-monitor"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "Network traffic monitoring service"

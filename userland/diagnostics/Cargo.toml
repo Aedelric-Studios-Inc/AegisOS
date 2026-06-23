@@ -1,0 +1,6 @@
+[package]
+name = "aegis-diagnostics"
+description = "AegisOS diagnostics tool"
+version.workspace = true
+edition.workspace = true
+license.workspace = true

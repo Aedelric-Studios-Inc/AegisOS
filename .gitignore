@@ -1,0 +1,33 @@
+# AegisOS generated files
+/build/
+cmake-build-*/
+*.o
+*.a
+*.so
+*.elf
+*.bin
+*.img
+*.iso
+*.dtb
+*.map
+*.tmp
+*.log
+
+# Rust/Cargo
+target/
+**/target/
+
+# Editor/OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Secrets and production keys
+.env
+.env.*
+!.env.example
+security/keys/prod/
+security/keys/*.pem
+security/keys/*.key

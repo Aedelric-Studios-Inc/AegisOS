@@ -1,0 +1,70 @@
+{
+  "arch": "aarch64",
+  "boot_chain_proven_through": [
+    "v35 ELF validation/bind",
+    "v36 VFS/initramfs file-backed ELF loading",
+    "v37 PT_LOAD copy and permission metadata",
+    "v38 argv/envp bootstrap and multiple descriptors",
+    "v39 packageable router image",
+    "v40 flash layout, QEMU image attachment path, persistent config partition"
+  ],
+  "boot_mode": {
+    "current_qemu_path": "-kernel build/aegisos.bin with v40 flash image attached as virtio block device",
+    "future_production_path": "firmware/bootloader loads kernel from AEGIS_BOOT partition"
+  },
+  "created_utc": "2026-06-23T02:35:43.488664+00:00",
+  "image": "build/images/AegisOS-v2.0-router-aarch64-v40-flash.img",
+  "image_sha256": "d8827f5fd08b3541a84bf06ffee4c1b92adad6a02b495066c4bc5df8b0f27b28",
+  "image_size_bytes": 268435456,
+  "milestone": "v40-flash-layout-disk-config",
+  "name": "AegisOS",
+  "partition_table": "MBR",
+  "partitions": [
+    {
+      "index": 1,
+      "name": "AEGIS_BOOT",
+      "offset": 1048576,
+      "role": "boot",
+      "sectors": 65536,
+      "size_bytes": 33554432,
+      "start_lba": 2048,
+      "status": 128,
+      "type": 12
+    },
+    {
+      "index": 2,
+      "name": "AEGIS_ROOT",
+      "offset": 34603008,
+      "role": "root",
+      "sectors": 327680,
+      "size_bytes": 167772160,
+      "start_lba": 67584,
+      "status": 0,
+      "type": 131
+    },
+    {
+      "index": 3,
+      "name": "AEGIS_CONFIG",
+      "offset": 202375168,
+      "role": "persistent-config",
+      "sectors": 65536,
+      "size_bytes": 33554432,
+      "start_lba": 395264,
+      "status": 0,
+      "type": 218
+    }
+  ],
+  "payloads": {
+    "boot_kernel_offset": 2097152,
+    "kernel_bin": "build/aegisos.bin",
+    "kernel_bin_sha256": "6222cccaf2ff04198d6b4fc8865a8305d565b88dcac790881790ef7eff38f34c",
+    "kernel_bin_size": 143672,
+    "kernel_elf": "build/aegisos.elf",
+    "kernel_elf_sha256": "acde26ef684c4fea76d4e33c6327b51ee6f70c484d96f6f3e3d72715d0008922",
+    "persistent_config_sha256": "9fd1715cea4bdbc9551ed916f25457499eed837cd37abcc48f72651e131e587e"
+  },
+  "release": "AegisOS-v2.0",
+  "sector_size": 512,
+  "status": "v40 flash-style layout image; QEMU disk attachment supported; full firmware disk boot remains a later bootloader/partition-filesystem milestone",
+  "target": "AegisBox / Aedelric Router flash-layout bring-up"
+}

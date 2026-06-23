@@ -1,0 +1,61 @@
+# Canonical runtime services for the AegisBox/Aegis Router production path.
+
+[[service]]
+name = "aegisd"
+bin = "/sbin/aegisd"
+restart = "always"
+critical = true
+
+[[service]]
+name = "rustmyadmin"
+bin = "/opt/rustmyadmin/rustmyadmin"
+restart = "always"
+requires = ["aegisd"]
+
+[[service]]
+name = "aegis-radio-manager"
+bin = "/sbin/aegis-radio-manager"
+restart = "always"
+requires = ["aegisd"]
+
+[[service]]
+name = "aegis-firewall"
+bin = "/sbin/aegis-firewall"
+restart = "always"
+requires = ["aegisd"]
+
+[[service]]
+name = "aegis-dns-filter"
+bin = "/sbin/aegis-dns-filter"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-vpn"
+bin = "/sbin/aegis-vpn"
+restart = "on-failure"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-intrusion-watch"
+bin = "/sbin/aegis-intrusion-watch"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-traffic-monitor"
+bin = "/sbin/aegis-traffic-monitor"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-router-provision"
+bin = "/usr/sbin/aegis-router-provision"
+restart = "once"
+critical = false
+
+[[service]]
+name = "dnsmasq"
+bin = "/usr/sbin/dnsmasq"
+restart = "always"
+requires = ["aegis-firewall"]

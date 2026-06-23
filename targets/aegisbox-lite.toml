@@ -1,0 +1,4 @@
+[target]
+name = "aegisbox-lite"
+board = "aegisbox-lite"
+arch = "aarch64"

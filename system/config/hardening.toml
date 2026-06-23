@@ -1,0 +1,68 @@
+# AegisOS hardened security baseline for AegisBox/Aegis Router.
+# This is the practical Security Operations baseline: secure configuration,
+# least privilege, visibility, drift detection, and incident response hooks.
+
+[profile]
+name = "aegisbox-hardened"
+mode = "production"
+default_decision = "deny"
+
+[boot]
+secure_boot = true
+verify_kernel = true
+verify_initramfs = true
+verify_rootfs = true
+allow_unsigned_boot = false
+
+[updates]
+signed_updates = true
+rollback_protection = true
+require_manifest_hashes = true
+staged_install = true
+recovery_required = true
+
+[identity]
+require_aegisd_token = true
+require_rustmyadmin_token = true
+allow_dev_loopback_trust = false
+session_timeout_seconds = 3600
+
+[audit]
+enabled = true
+path = "/var/log/aegis/audit.log"
+max_events = 8192
+forward_to_rustmyadmin = true
+alert_on_integrity_failure = true
+alert_on_policy_denied = true
+alert_on_sandbox_violation = true
+
+[services]
+allow_list_enabled = true
+least_privilege = true
+restart_critical_services = true
+critical = ["aegisd", "rustmyadmin", "aegis-firewall", "aegis-dns-filter", "aegis-radio-manager"]
+required_visibility = ["aegis-intrusion-watch", "aegis-traffic-monitor"]
+
+[network]
+default_inbound = "drop"
+default_forward = "drop"
+default_outbound = "allow"
+block_rfc1918_from_wan = true
+anti_spoofing = true
+rate_limit_admin_api = true
+
+[intrusion_detection]
+enabled = true
+port_scan_threshold = 15
+flood_bytes_per_second = 10000
+incident_log = "/var/log/aegis/incidents.log"
+
+[integrity]
+enabled = true
+manifest = "/etc/aegis/integrity.manifest"
+watch_paths = ["/sbin", "/bin", "/etc/aegis", "/opt/rustmyadmin"]
+
+[secrets]
+store = "/var/lib/aegis/secrets"
+web_root_allowed = false
+permissions = "0600"

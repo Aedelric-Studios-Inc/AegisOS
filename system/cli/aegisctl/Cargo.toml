@@ -1,0 +1,9 @@
+[package]
+name = "system-aegisctl"
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+
+[[bin]]
+name = "system-aegisctl"
+path = "src/main.rs"
