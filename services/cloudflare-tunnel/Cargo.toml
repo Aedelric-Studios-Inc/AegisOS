@@ -1,0 +1,6 @@
+[package]
+name        = "aegis-cloudflare-tunnel"
+version     = "0.1.0"
+edition     = "2021"
+license     = "Proprietary"
+description = "Cloudflare tunnel client service"

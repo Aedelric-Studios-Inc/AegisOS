@@ -1,0 +1,33 @@
+/* AegisBox Pro Device Tree Source */
+/dts-v1/;
+
+/ {
+    compatible = "aegis,aegisbox-pro";
+    model = "AegisBox Pro";
+    #address-cells = <2>;
+    #size-cells = <1>;
+
+    memory@40000000 {
+        device_type = "memory";
+        reg = <0x0 0x40000000 0x80000000>;
+    };
+
+    uart0: serial@fe201000 {
+        compatible = "arm,pl011", "arm,primecell";
+        reg = <0x0 0xfe201000 0x200>;
+        clock-frequency = <48000000>;
+        current-speed = <115200>;
+        status = "okay";
+    };
+
+    emmc: mmc@fe340000 {
+        compatible = "brcm,bcm2835-mmc";
+        reg = <0x0 0xfe340000 0x100>;
+        status = "okay";
+    };
+
+    timer {
+        compatible = "arm,armv8-timer";
+        clock-frequency = <54000000>;
+    };
+};

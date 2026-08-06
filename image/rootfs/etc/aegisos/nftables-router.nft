@@ -1,0 +1,33 @@
+flush table inet aegis
+flush table ip aegis_nat
+
+table inet aegis {
+  chain input {
+    type filter hook input priority 0; policy drop;
+    iifname "lo" accept
+    ct state established,related accept
+    iifname "eth1" tcp dport { 22, 8443 } accept
+    iifname "eth1" udp dport { 53, 67 } accept
+    ip protocol icmp accept
+    counter log prefix "AEGIS-DROP-IN " drop
+  }
+
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+    ct state established,related accept
+    iifname "eth1" oifname { "eth0", "wwan0" } accept
+    counter log prefix "AEGIS-DROP-FWD " drop
+  }
+
+  chain output {
+    type filter hook output priority 0; policy accept;
+  }
+}
+
+table ip aegis_nat {
+  chain postrouting {
+    type nat hook postrouting priority 100; policy accept;
+    oifname "eth0" masquerade
+    oifname "wwan0" masquerade
+  }
+}

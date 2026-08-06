@@ -1,0 +1,1 @@
+/* Compatibility placeholder for kernel UART driver split. */

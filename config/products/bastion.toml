@@ -1,0 +1,7 @@
+product = "bastion"
+board = "bastion"
+version = "2.0.0-pre.1"
+primary_storage = "nvme"
+installer = "usb-to-nvme"
+network_ports = 2
+services = ["aegis-init", "service-manager", "aegisd", "securityd", "netd", "firewalld", "routerd", "dashboard", "rustmyadmin"]

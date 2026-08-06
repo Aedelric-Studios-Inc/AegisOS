@@ -1,0 +1,6 @@
+[package]
+name = "update-manager"
+description = "AegisOS OTA update manager"
+version.workspace = true
+edition.workspace = true
+license.workspace = true

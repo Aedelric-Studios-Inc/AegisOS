@@ -1,0 +1,22 @@
+# AegisOS Router network role map.
+# These names are the production contract for ÆÐELRIC Router/AegisBox bring-up.
+
+[router]
+hostname = "aegisbox-router"
+lan_address = "192.168.88.1/24"
+lan_gateway = "192.168.88.1"
+dhcp_start = "192.168.88.100"
+dhcp_end = "192.168.88.240"
+dns_listen = "192.168.88.1"
+
+[interfaces]
+wan = "eth0"
+lan = "eth1"
+wifi = "wlan0"
+wwan = "wwan0"
+bluetooth = "bt0"
+
+[failover]
+prefer = ["wan", "wifi", "wwan"]
+restore_primary_when_available = true
+health_check = "1.1.1.1"

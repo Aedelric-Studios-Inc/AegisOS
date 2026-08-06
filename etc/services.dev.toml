@@ -1,0 +1,132 @@
+# Native x86_64 development manifest.
+# The host launcher runs this from the AegisOS repository root.
+
+[[service]]
+name = "aegisd"
+bin = "./system/daemon/aegisd/target/release/aegisd"
+args = []
+env = ["AEGISD_SOCKET=/run/aegisd.sock", "AEGISD_SOCKET_MODE=0660", "AEGISD_DEV_TRUST_LOCAL=1"]
+inherit_env = ["AEGISD_TOKEN"]
+restart = "always"
+critical = true
+requires = []
+
+[[service]]
+name = "router-provision"
+bin = "./tools/dev/router-provision.sh"
+args = []
+restart = "on-failure"
+critical = true
+requires = ["aegisd"]
+
+[[service]]
+name = "firewall"
+bin = "./services/firewall/target/release/aegis-firewall"
+args = []
+env = ["AEGIS_FIREWALL_SKIP_APPLY=1"]
+restart = "always"
+critical = true
+requires = ["router-provision"]
+
+[[service]]
+name = "dns-filter"
+bin = "./services/dns-filter/target/release/aegis-dns-filter"
+args = []
+env = ["AEGIS_DNS_FILTER_LISTEN=127.0.0.1:53530", "AEGIS_DNS_FILTER_UPSTREAM=1.1.1.1:53"]
+restart = "always"
+critical = true
+requires = ["router-provision", "firewall"]
+
+[[service]]
+name = "dnsmasq"
+bin = "/usr/bin/dnsmasq"
+args = ["--keep-in-foreground", "--conf-file=/run/aegisos-router/dnsmasq.conf"]
+restart = "always"
+critical = true
+requires = ["router-provision", "dns-filter"]
+
+[[service]]
+name = "traffic-monitor"
+bin = "./services/traffic-monitor/target/release/aegis-traffic-monitor"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "intrusion-watch"
+bin = "./services/intrusion-watch/target/release/aegis-intrusion-watch"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd", "traffic-monitor"]
+
+[[service]]
+name = "device-discovery"
+bin = "./services/device-discovery/target/release/aegis-device-discovery"
+args = []
+env = ["AEGIS_LAN_INTERFACE=aegis-lan0"]
+restart = "always"
+critical = false
+requires = ["router-provision"]
+
+[[service]]
+name = "vpn"
+bin = "./services/vpn/target/release/aegis-vpn"
+args = []
+env = ["AEGIS_VPN_INTERFACE=wg0", "AEGIS_VPN_AUTOSTART=1"]
+restart = "always"
+critical = false
+requires = ["router-provision", "firewall"]
+
+[[service]]
+name = "cloudflare-tunnel"
+bin = "./services/cloudflare-tunnel/target/release/aegis-cloudflare-tunnel"
+args = []
+restart = "on-failure"
+critical = false
+requires = ["aegisd", "dnsmasq"]
+
+[[service]]
+name = "container-runner"
+bin = "./services/container-runner/target/release/aegis-container-runner"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "web-hosting"
+bin = "./services/web-hosting/target/release/aegis-web-hosting"
+args = []
+env = ["AEGIS_WEB_BIND=127.0.0.1:8088", "AEGIS_WEBROOT=/var/www/aegisos"]
+restart = "always"
+critical = false
+requires = ["aegisd", "firewall"]
+
+[[service]]
+name = "radio-manager"
+bin = "./services/radio-manager/target/release/aegis-radio-manager"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "dashboard"
+bin = "./dashboard/target/release/aegis-dashboard"
+args = []
+inherit_env = ["AEGIS_DASHBOARD_TOKEN"]
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "rustmyadmin"
+bin = "./rustmyadmin/target/release/rustmyadmin"
+args = []
+env = ["AEGISD_SOCKET=/run/aegisd.sock", "RUSTMYADMIN_DB_PATH=/var/lib/rustmyadmin/config.db"]
+inherit_env = ["RUSTMYADMIN_ADMIN_PASSWORD", "AEGISD_TOKEN"]
+restart = "always"
+critical = false
+requires = ["aegisd", "dashboard"]

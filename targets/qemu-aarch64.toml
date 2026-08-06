@@ -1,0 +1,4 @@
+[target]
+name = "qemu-aarch64"
+board = "virt"
+arch = "aarch64"

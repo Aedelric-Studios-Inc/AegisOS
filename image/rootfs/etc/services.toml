@@ -1,0 +1,103 @@
+[[service]]
+name = "aegisd"
+bin = "/sbin/aegisd"
+args = []
+restart = "always"
+critical = true
+requires = []
+
+[[service]]
+name = "firewall"
+bin = "/usr/sbin/aegis-firewall"
+args = []
+restart = "always"
+critical = true
+requires = ["aegisd"]
+
+[[service]]
+name = "dns-filter"
+bin = "/usr/sbin/aegis-dns-filter"
+args = []
+restart = "always"
+critical = true
+requires = ["aegisd", "firewall"]
+
+[[service]]
+name = "traffic-monitor"
+bin = "/usr/sbin/aegis-traffic-monitor"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "intrusion-watch"
+bin = "/usr/sbin/aegis-intrusion-watch"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd", "traffic-monitor"]
+
+[[service]]
+name = "device-discovery"
+bin = "/usr/sbin/aegis-device-discovery"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "vpn"
+bin = "/usr/sbin/aegis-vpn"
+args = []
+restart = "on-failure"
+critical = false
+requires = ["aegisd", "firewall"]
+
+[[service]]
+name = "cloudflare-tunnel"
+bin = "/usr/sbin/aegis-cloudflare-tunnel"
+args = []
+restart = "on-failure"
+critical = false
+requires = ["aegisd", "dns-filter"]
+
+[[service]]
+name = "container-runner"
+bin = "/usr/sbin/aegis-container-runner"
+args = []
+restart = "on-failure"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "web-hosting"
+bin = "/usr/sbin/aegis-web-hosting"
+args = []
+restart = "on-failure"
+critical = false
+requires = ["aegisd", "container-runner", "firewall"]
+
+[[service]]
+name = "radio-manager"
+bin = "/usr/sbin/aegis-radio-manager"
+args = []
+restart = "on-failure"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "dashboard"
+bin = "/usr/sbin/aegis-dashboard"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd"]
+
+[[service]]
+name = "rustmyadmin"
+bin = "/usr/sbin/rustmyadmin"
+args = []
+restart = "always"
+critical = false
+requires = ["aegisd", "dashboard"]

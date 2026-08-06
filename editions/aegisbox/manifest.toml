@@ -1,0 +1,24 @@
+name = "AegisBox Edition"
+base = "AegisOS Core"
+status = "production-prep"
+primary_target = "aegisbox-bastion"
+
+[features]
+rustmyadmin = true
+aegisd = true
+firewall = true
+nat = true
+dns_filter = true
+vpn = true
+lte_failover = true
+bluetooth = true
+wifi = true
+signed_updates = true
+recovery = true
+
+[excluded]
+mobile_shell = true
+phone_calls = true
+sms_mms = true
+ims_volte = true
+camera_hal = true

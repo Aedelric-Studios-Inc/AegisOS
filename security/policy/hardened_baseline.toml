@@ -1,0 +1,34 @@
+# AegisOS hardened policy baseline.
+# Keep kernel/core policy generic so AegisBox and later PhoenixOS can share it.
+
+[defaults]
+process = "deny"
+network = "deny-inbound"
+filesystem = "deny-write"
+ipc = "deny-unlabelled"
+capabilities = "least-privilege"
+audit = "log-deny"
+
+[[allow_service]]
+name = "aegisd"
+capabilities = ["ipc", "service-control", "audit-read", "policy-read"]
+
+[[allow_service]]
+name = "rustmyadmin"
+capabilities = ["ipc", "dashboard-read", "dashboard-write", "audit-read"]
+requires = ["aegisd"]
+
+[[allow_service]]
+name = "aegis-firewall"
+capabilities = ["net-admin", "policy-read", "audit-write"]
+requires = ["aegisd"]
+
+[[allow_service]]
+name = "aegis-radio-manager"
+capabilities = ["radio-control", "network-status", "audit-write"]
+requires = ["aegisd"]
+
+[[allow_service]]
+name = "aegis-intrusion-watch"
+capabilities = ["network-monitor", "audit-write"]
+requires = ["aegis-firewall"]

@@ -1,0 +1,29 @@
+# AegisOS-v2.0 v39 stage-one image layout.
+# This is a dependency-light raw container layout. Later production flashing
+# milestones can replace this with true GPT/FAT/ext4 board images.
+
+[image]
+name = "AegisOS-v2.0-router-aarch64.img"
+format = "aegisos-v2-raw-container"
+size_mib = 64
+
+[[region]]
+label = "aegis-header"
+offset = "0x00000000"
+description = "AegisOS image magic, release metadata, and deterministic offsets"
+
+[[region]]
+label = "kernel"
+offset = "0x00100000"
+payload = "build/aegisos.bin"
+description = "ARM64 kernel payload"
+
+[[region]]
+label = "metadata"
+offset = "0x00800000"
+description = "Image manifest embedded in the raw container"
+
+[[region]]
+label = "rootfs-reserved"
+offset = "0x01000000"
+description = "Reserved for future router rootfs/config-service payload"

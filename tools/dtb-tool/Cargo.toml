@@ -1,0 +1,5 @@
+[package]
+name    = "aegis-dtb-tool"
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"

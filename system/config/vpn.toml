@@ -1,0 +1,6 @@
+[vpn]
+backend = "wireguard-tools"
+enabled = false
+interface = "wg0"
+config_path = "/etc/wireguard/wg0.conf"
+autostart = false

@@ -1,0 +1,9 @@
+[package]
+name = "aegis-radio-manager"
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+
+[[bin]]
+name = "aegis-radio-manager"
+path = "src/main.rs"

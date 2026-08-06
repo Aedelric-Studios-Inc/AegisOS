@@ -1,0 +1,23 @@
+[workspace]
+members = [
+    "init",
+    "aegisctl",
+    "shell",
+    "service-manager",
+    "netctl",
+    "update-manager",
+    "recovery",
+    "diagnostics",
+    "aegis-rt",
+    "native-rust/aegis-init",
+    "native-rust/service-manager",
+    "native-rust/aegisd",
+    "native-rust/dashboard",
+    "native-rust/rustmyadmin",
+]
+resolver = "2"
+
+[workspace.package]
+version  = "0.1.0"
+edition  = "2021"
+license  = "Proprietary"

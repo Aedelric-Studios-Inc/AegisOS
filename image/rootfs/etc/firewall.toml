@@ -1,0 +1,19 @@
+# AegisBox hardened firewall baseline.
+# Backend: nftables. The canonical generated ruleset lives at
+# /etc/aegisos/nftables-router.nft on device images.
+
+[defaults]
+backend = "nftables"
+inbound = "drop"
+forward = "drop"
+outbound = "allow"
+anti_spoofing = true
+log_drops = true
+nat = true
+
+[router]
+lan_interface = "eth1"
+wan_interface = "eth0"
+wwan_interface = "wwan0"
+admin_tcp_ports = [22, 8443]
+lan_udp_services = [53, 67]

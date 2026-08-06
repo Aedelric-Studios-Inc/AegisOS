@@ -1,0 +1,15 @@
+# dnsmasq-backed DNS/DHCP for AegisBox Router.
+
+[dns]
+backend = "dnsmasq"
+listen_address = "192.168.88.1"
+upstream = ["1.1.1.1", "9.9.9.9"]
+block_private_reverse = true
+require_domain = true
+
+[dhcp]
+interface = "eth1"
+range_start = "192.168.88.100"
+range_end = "192.168.88.240"
+lease_time = "12h"
+gateway = "192.168.88.1"

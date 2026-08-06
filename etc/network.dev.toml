@@ -1,0 +1,21 @@
+# Laptop-safe AegisOS router development profile.
+# The active host WAN is discovered and preserved. A dedicated bridge is used
+# as the simulated physical LAN until AegisBox hardware provides a second NIC.
+
+[router]
+auto_discover = true
+manage_wan = false
+hostname = "aegisbox-dev"
+lan_address = "192.168.88.1/24"
+lan_subnet = "192.168.88.0/24"
+lan_gateway = "192.168.88.1"
+dhcp_start = "192.168.88.100"
+dhcp_end = "192.168.88.240"
+dns_listen = "192.168.88.1"
+
+[interfaces]
+wan = "auto"
+lan = "aegis-lan0"
+wifi = "auto"
+wwan = "auto"
+bluetooth = "bt0"

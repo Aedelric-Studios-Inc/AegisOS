@@ -1,0 +1,12 @@
+[package]
+name = "aegis-init-native"
+version = "0.1.0"
+edition = "2021"
+license = "Proprietary"
+
+[dependencies]
+aegis-rt = { path = "../../aegis-rt" }
+
+[[bin]]
+name = "aegis-init"
+path = "src/main.rs"

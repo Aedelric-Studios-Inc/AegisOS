@@ -1,0 +1,7 @@
+product = "router"
+board = "router"
+version = "2.0.0-pre.1"
+primary_storage = "board-defined"
+installer = "disk-image"
+network_ports = 2
+services = ["aegis-init", "service-manager", "aegisd", "netd", "firewalld", "routerd", "rustmyadmin"]

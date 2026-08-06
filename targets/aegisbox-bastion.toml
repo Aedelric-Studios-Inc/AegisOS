@@ -1,0 +1,4 @@
+[target]
+name = "aegisbox-bastion"
+board = "bastion"
+arch = "aarch64"

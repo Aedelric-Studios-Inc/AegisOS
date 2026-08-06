@@ -1,0 +1,18 @@
+[package]
+name = "aegis-security"
+version = "0.1.0"
+edition = "2021"
+description = "AegisOS security subsystem — capabilities, sandboxing, audit, keyring, integrity, secure boot, policy engine"
+license = "Proprietary"
+
+[lib]
+name = "aegis_security"
+path = "src/lib.rs"
+
+[dependencies]
+# no_std compatible; add dependencies here as needed
+
+[profile.release]
+opt-level = "z"
+lto = true
+panic = "abort"

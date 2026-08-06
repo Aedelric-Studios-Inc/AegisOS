@@ -1,0 +1,24 @@
+# AegisOS radio manager configuration.
+# Used by the ÆÐELRIC Router/AegisBox LTE module first, then reused as a
+# PhoenixOS radio-abstraction reference later.
+
+[radio]
+enabled = true
+backend = "modemmanager"
+network_backend = "networkmanager"
+primary_carrier = "giffgaff"
+allow_roaming = false
+health_poll_seconds = 30
+
+[failover]
+prefer = ["ethernet", "wifi", "lte"]
+lte_failover_enabled = true
+restore_primary_when_available = true
+
+[[carrier_profile]]
+name = "giffgaff"
+country = "uk"
+apn = "giffgaff.com"
+username = "giffgaff"
+password = ""
+auth = "pap-or-chap"

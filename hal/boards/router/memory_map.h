@@ -1,0 +1,3 @@
+#pragma once
+#define PHYS_MEM_BASE 0x40000000ULL
+#define PHYS_MEM_SIZE 0x40000000ULL

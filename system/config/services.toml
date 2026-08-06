@@ -1,0 +1,90 @@
+# Canonical runtime services for the AegisBox/Aegis Router production path.
+# PID 1 starts only /sbin/service-manager. The service manager owns everything below.
+
+[[service]]
+name = "aegisd"
+bin = "/sbin/aegisd"
+restart = "always"
+critical = true
+
+[[service]]
+name = "aegis-firewall"
+bin = "/sbin/aegis-firewall"
+restart = "always"
+critical = true
+requires = ["aegisd"]
+
+[[service]]
+name = "aegis-dns-filter"
+bin = "/sbin/aegis-dns-filter"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-vpn"
+bin = "/sbin/aegis-vpn"
+restart = "on-failure"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-intrusion-watch"
+bin = "/sbin/aegis-intrusion-watch"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-traffic-monitor"
+bin = "/sbin/aegis-traffic-monitor"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-device-discovery"
+bin = "/sbin/aegis-device-discovery"
+restart = "always"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-radio-manager"
+bin = "/sbin/aegis-radio-manager"
+restart = "always"
+requires = ["aegisd"]
+
+[[service]]
+name = "aegis-cloudflare-tunnel"
+bin = "/sbin/aegis-cloudflare-tunnel"
+restart = "on-failure"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-web-hosting"
+bin = "/sbin/aegis-web-hosting"
+restart = "on-failure"
+requires = ["aegis-firewall"]
+
+[[service]]
+name = "aegis-container-runner"
+bin = "/sbin/aegis-container-runner"
+restart = "always"
+requires = ["aegisd"]
+
+[[service]]
+name = "rustmyadmin"
+bin = "/opt/rustmyadmin/rustmyadmin"
+restart = "always"
+requires = ["aegisd"]
+
+[[service]]
+name = "aegis-router-provision"
+bin = "/usr/sbin/aegis-router-provision"
+restart = "once"
+critical = false
+requires = ["aegis-firewall"]
+
+# Optional external backend. If absent, service-manager logs once and moves on.
+[[service]]
+name = "dnsmasq"
+bin = "/usr/sbin/dnsmasq"
+restart = "on-failure"
+critical = false
+requires = ["aegis-firewall"]
